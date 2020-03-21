@@ -46,4 +46,21 @@ numpy==1.16.3
 4. Setup.sh and Procfile
 
 Heroku needs these files for starting the app
+    - setup.sh : create a streamlit folder with both credentials.toml and config.toml files.
 
+```sh
+mkdir -p ~/.streamlit/
+
+echo "\
+[general]\n\
+email = \"your-email@domain.com\"\n\
+" > ~/.streamlit/credentials.toml
+
+echo "\
+[server]\n\
+headless = true\n\
+enableCORS=false\n\
+port = $PORT\n\
+" > ~/.streamlit/config.toml
+```
+    - Procfile :
