@@ -6,14 +6,12 @@
 
 ![alt text](https://github.com/emunozlorenzo/MasterDataScience/blob/master/img/icon2.png "Logo Title Text 1") [Eduardo Muñoz](https://www.linkedin.com/in/eduardo-mu%C3%B1oz-lorenzo-14144a144/)
 
-1. Create a Repo
-
-Create a Github Repo and Clone it in your Local Environment.
+1. Create a Git Repo
 
 _Note: Heroku allows deployment using Git or Docker._
 
 ```sh
-git clone https://github.com/emunozlorenzo/Deploying-Streamlit-with-Heroku.git
+git init
 ```
 
 2. Build your App
@@ -87,3 +85,27 @@ Create a free account
 7. Install Heroku CLI
 
 [Follow these steps](https://devcenter.heroku.com/articles/getting-started-with-python#set-up)
+
+8. Login into Heroku CLI
+
+Move to your App folder and execute ```heroku login```
+
+9. Deploy the App
+
+Deploy your app by running ```heroku create``` in your app folder
+
+10. Check it
+
+Check your app by running ```heroku ps:scale web=1```
+
+After that, push your code
+
+```sh
+git add .
+git commit -m "message"
+git push heroku master
+```
+
+11. Open it
+
+Open your app using ```heroku open```

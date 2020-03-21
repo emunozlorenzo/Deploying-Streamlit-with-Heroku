@@ -1,31 +1,108 @@
 import streamlit as st
 import numpy as np
 import pandas as pd
-#from datetime import date, timedelta, datetime
 import datetime
 import matplotlib.pyplot as plt
+plt.style.use('ggplot')
 import seaborn as sns
+from matplotlib.ticker import ScalarFormatter
 
 def main():
     
     df = load_data()
     countries = load_countries(df)
+    data = grouped_data(df)
     
-    page = st.sidebar.selectbox("Choose a page", ['Homepage', 'Exploration', 'Prediction'])
+    page = st.sidebar.selectbox("Choose a page", ['Homepage', 'Top 10', 'Prediction'])
     
     if page == 'Homepage':
         # Front Image
         url = 'https://www.charlescountymd.gov/Home/ShowPublishedImage/4496/637195158875230000'
         st.image(url,use_column_width=True)
         st.title("COVID-19")
+        ####################################################################################################
+        st.subheader('1. DATA BY COUNTRY')
         # Table
         filtro = st.selectbox('Select a Country',countries)
         st.subheader(filtro+' Dataframe')
         st.write(df.loc[df['Country'] == filtro,['Country','Date','Confirmed','Recovered','Deaths']])
+        # Graph
+        st.subheader(filtro+' Plot')
+        features = {'Confirmed':'blue','Recovered':'green','Deaths':'red','All':None}
+        filtro2 = st.selectbox('Select Feature',list(features.keys()))
+        fig, ax = plt.subplots(figsize=(12,6))
+        if filtro2 =='All':
+            ax.plot(df.loc[df['Country']==filtro,['Date']],df.loc[df['Country']==filtro,['Confirmed','Recovered','Deaths']],alpha=0.6)
+            plt.legend(['Confirmed','Recovered','Deaths'])
+        else:
+            ax.plot(df.loc[df['Country']==filtro,['Date']],df.loc[df['Country']==filtro,[filtro2]],label=filtro2,color=features[filtro2],alpha=0.6)
+            plt.legend()
+        plt.title(filtro)
+        
+        if st.checkbox('Log Scale',value=False):
+            ax.set_yscale('log')
+        st.pyplot()
+        ####################################################################################################
+        st.subheader('2. CUMULATIVE PLOT')
+        ##########################################
+        st.subheader('2.1 Cumulative Plot since 10th Death')
+        multiselect = st.multiselect('Select Countries',df['Country'].unique().tolist(),default=["Spain","Italy","Germany","France","United Kingdom","United States"],key='number1')
+        x = list(range(24))
+        y = [10*(1+0.33)**num for num in x]
+        jet= plt.get_cmap('jet')
+        colors = iter(jet(np.linspace(0,1,len(multiselect))))
+        less_10 = []
+        fig, ax = plt.subplots(figsize=(12,6))
+        for c in multiselect:
+            if data.loc[c,['Deaths']]['Deaths'].values[-1] >=10:
+                my_color = next(colors)
+                ax.plot(data.loc[c].query('Deaths>=10')['Deaths'].values,label=c,marker=".",color=my_color)
+                ax.text(len(data.loc[c].query('Deaths>=10')['Deaths'].values.tolist()),data.loc[c].query('Deaths>=10')['Deaths'].values.tolist()[-1],c,color=my_color,weight="bold",family="monospace")
+            else:
+                less_10.append(c)
+            ax.set_yscale('log')
+            ax.set_yticks([20, 50, 100, 200, 500, 1000,2000,3000,10000])
+            ax.get_yaxis().set_major_formatter(ScalarFormatter())
+            plt.plot(x,y,'--',color='black',alpha=0.5)
+            plt.text(len(x),y[-1],'33% Daily Increase',color='grey',weight="bold",family="monospace")
+            plt.title('Cumulative Number of Deaths, by number of days since 10th death')
+        st.pyplot()
+        for i in less_10:
+            st.text('Attention: '+i+' has less than 10 Deaths. Please, Remove this country.')
+        ##########################################    
+        st.subheader('2.2 Cumulative Plot since 500th Confirmed Case')
+        multiselect_2 = st.multiselect('Select Countries',df['Country'].unique().tolist(),default=["Spain","Italy","Germany","France","United Kingdom","United States"],key='number2')
+        x = list(range(24))
+        y = [500*(1+0.33)**num for num in x]
+        jet= plt.get_cmap('jet')
+        colors = iter(jet(np.linspace(0,1,len(multiselect_2))))
+        less_500 = []
+        fig, ax = plt.subplots(figsize=(12,6))
+        for c in multiselect_2:
+            if data.loc[c,['Confirmed']]['Confirmed'].values[-1] >=500:
+                my_color = next(colors)
+                ax.plot(data.loc[c].query('Confirmed>=500')['Confirmed'].values,label=c,marker=".",color=my_color)
+                ax.text(len(data.loc[c].query('Confirmed>=500')['Confirmed'].values.tolist()),data.loc[c].query('Confirmed>=500')['Confirmed'].values.tolist()[-1],c,color=my_color,weight="bold",family="monospace")
+            else:
+                less_500.append(c)
+            ax.set_yscale('log')
+            ax.set_yticks([500,1000,5000,10000,20000,50000,100000])
+            ax.get_yaxis().set_major_formatter(ScalarFormatter())
+            plt.plot(x,y,'--',color='black',alpha=0.5)
+            plt.text(len(x),y[-1],'33% Daily Increase',color='grey',weight="bold",family="monospace")
+            plt.title('Cumulative Number of Confirmed cases, by number of days since 500th Confirmed')
+        st.pyplot()
+        for i in less_500:
+            st.text('Attention: '+i+' has less than 500 Confirmed Cases. Please, Remove this country.')
+        ####################################################################################################
+    elif page == 'Top 10':
+        # Front Image
+        url = 'https://www.charlescountymd.gov/Home/ShowPublishedImage/4496/637195158875230000'
+        st.image(url,use_column_width=True)
+        st.title("COVID-19")
     
-    
-    
-    
+
+
 ########### FUNCTIONS ###########
 @st.cache
 def load_data():
@@ -34,7 +111,7 @@ def load_data():
     files = []
     # Dates
     start_date =  datetime.date(2020,1,22) # First Report
-    end_date = datetime.date.today() - datetime.timedelta(days=1)# Today
+    end_date = datetime.date.today() - datetime.timedelta(days=2)# Today
     delta = end_date - start_date # Days from the first report
     # Files
     for i in range(delta.days+1):
@@ -63,6 +140,11 @@ def load_data():
     fix_provinces(df,dict_provinces)
     
     return df
+
+@st.cache
+def grouped_data(dataframe):
+    data = dataframe.groupby(['Country','Date'])['Confirmed','Recovered','Deaths'].sum()
+    return data
 
 @st.cache
 def load_dict_countries():
