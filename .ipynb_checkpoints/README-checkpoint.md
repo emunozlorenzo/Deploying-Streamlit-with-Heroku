@@ -46,7 +46,9 @@ numpy==1.16.3
 4. Setup.sh and Procfile
 
 Heroku needs these files for starting the app
+
     - setup.sh : create a streamlit folder with both credentials.toml and config.toml files.
+    - Procfile : This file executes the setup.sh and then call streamlit run to run the app
 
 ```sh
 mkdir -p ~/.streamlit/
@@ -63,4 +65,6 @@ enableCORS=false\n\
 port = $PORT\n\
 " > ~/.streamlit/config.toml
 ```
-    - Procfile :
+```sh
+web: sh setup.sh && streamlit run app.py
+```
