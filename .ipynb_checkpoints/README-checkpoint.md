@@ -6,8 +6,17 @@
 
 ![alt text](https://github.com/emunozlorenzo/MasterDataScience/blob/master/img/icon2.png "Logo Title Text 1") [Eduardo Muñoz](https://www.linkedin.com/in/eduardo-mu%C3%B1oz-lorenzo-14144a144/)
 
+1. Create a Repo
 
-1. Build your App
+Create a Github Repo and Clone it in your Local Environment.
+
+_Note: Heroku allows deployment using Git or Docker._
+
+```sh
+git clone https://github.com/emunozlorenzo/Deploying-Streamlit-with-Heroku.git
+```
+
+2. Build your App
 
 ```py
 import streamlit as st
@@ -20,13 +29,13 @@ if __name__ == "__main__":
     main()
 ```
 
-2. Test your App (Local Environment)
+3. Test your App (Local Environment)
 
 ```sh
 ~$ streamlit run app.py
 ```
 
-3. Create your requeriments.txt file
+4. Create your requeriments.txt file
 
 This file contains the libraries that your code needs to work. To do this, you can use ```pipreqs```.
 
@@ -43,7 +52,7 @@ seaborn==0.9.0
 numpy==1.16.3
 ```
 
-4. Setup.sh and Procfile
+5. Setup.sh and Procfile
 
 Heroku needs these files for starting the app
 
@@ -51,6 +60,7 @@ Heroku needs these files for starting the app
     - Procfile : This file executes the setup.sh and then call streamlit run to run the app
 
 ```sh
+# Setup.sh
 mkdir -p ~/.streamlit/
 
 echo "\
@@ -66,5 +76,13 @@ port = $PORT\n\
 " > ~/.streamlit/config.toml
 ```
 ```sh
+# Procfile
 web: sh setup.sh && streamlit run app.py
 ```
+
+6. Create a Heroku Account
+
+Create a free account
+
+7. Install Heroku CLI
+[Follow these steps]('https://devcenter.heroku.com/articles/getting-started-with-python#set-up')
