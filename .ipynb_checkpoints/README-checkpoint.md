@@ -85,4 +85,5 @@ web: sh setup.sh && streamlit run app.py
 Create a free account
 
 7. Install Heroku CLI
-[Follow these steps]('https://devcenter.heroku.com/articles/getting-started-with-python#set-up')
+
+[Follow these steps](https://devcenter.heroku.com/articles/getting-started-with-python#set-up)
