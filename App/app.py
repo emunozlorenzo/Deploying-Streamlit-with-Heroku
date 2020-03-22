@@ -25,14 +25,14 @@ def main():
         st.title("COVID-19")
         ####################################################################################################
         st.subheader('1. DATA BY COUNTRY')
-        # Table
+        ##########################################
         filtro = st.selectbox('Select a Country',countries)
         st.subheader('1.1 '+filtro+' Dataframe')
         st.write(df.loc[df['Country'] == filtro,['Country','Date','Confirmed','Recovered','Deaths']])
-        # Graph
+        ###########################################
         st.subheader('1.2 '+filtro+' Plot')
         features = {'Confirmed':'blue','Recovered':'green','Deaths':'red','All':None}
-        filtro2 = st.selectbox('Select Feature',list(features.keys()))
+        filtro2 = st.selectbox('Select Feature',list(features.keys()),key='filtro2')
         fig, ax = plt.subplots(figsize=(12,6))
         if filtro2 =='All':
             ax.plot(data.loc[filtro,['Confirmed','Recovered','Deaths']],alpha=0.6)
@@ -45,15 +45,18 @@ def main():
         if st.checkbox('Log Scale',value=False):
             ax.set_yscale('log')
         st.pyplot()
-        st.subheader('1.3 '+filtro+': New Confirmed Cases by day')
-        ax = data.loc[filtro][['Confirmed']].diff().plot(kind='bar',figsize=(12,6),color='blue',alpha=0.6)
+        ##########################################
+        st.subheader('1.3 '+filtro+': New Cases by day')
+        filtro3 = st.selectbox('Select Feature',['Confirmed','Recovered','Deaths'],key='filtro3')
+        ax = data.loc[filtro][[filtro3]].diff().plot(kind='bar',figsize=(12,6),color='blue',alpha=0.6)
         ax.set_xticklabels(data.loc[filtro].index.strftime("%d/%m"),rotation=90)
+        plt.title(filtro)
         st.pyplot()
         ####################################################################################################
         st.subheader('2. CUMULATIVE PLOT')
         ##########################################
         st.subheader('2.1 Cumulative Plot since 10th Death')
-        multiselect = st.multiselect('Select Countries',df['Country'].unique().tolist(),default=["Spain","Italy","Germany","France","United Kingdom","United States"],key='number1')
+        multiselect = st.multiselect('Select Countries',options=df['Country'].unique().tolist(),default=['Spain','Italy','France','Germany','United States','United Kingdom'],key='number8')
         x = list(range(24))
         y = [10*(1+0.33)**num for num in x]
         jet= plt.get_cmap('jet')
@@ -78,7 +81,7 @@ def main():
             st.text('Attention: '+i+' has less than 10 Deaths. Please, Remove this country.')
         ##########################################    
         st.subheader('2.2 Cumulative Plot since 500th Confirmed Case')
-        multiselect_2 = st.multiselect('Select Countries',df['Country'].unique().tolist(),default=["Spain","Italy","Germany","France","United Kingdom","United States"],key='number2')
+        multiselect_2 = st.multiselect('Select Countries',options=df['Country'].unique().tolist(),default=['Spain','Italy','France','Germany','United States','United Kingdom'],key='number9')
         x = list(range(24))
         y = [500*(1+0.33)**num for num in x]
         jet= plt.get_cmap('jet')
