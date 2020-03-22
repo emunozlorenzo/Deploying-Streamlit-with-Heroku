@@ -3,9 +3,12 @@ import numpy as np
 import pandas as pd
 import datetime
 import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
+from matplotlib.ticker import ScalarFormatter
 plt.style.use('ggplot')
 import seaborn as sns
-from matplotlib.ticker import ScalarFormatter
+
+
 
 def main():
     
@@ -24,23 +27,27 @@ def main():
         st.subheader('1. DATA BY COUNTRY')
         # Table
         filtro = st.selectbox('Select a Country',countries)
-        st.subheader(filtro+' Dataframe')
+        st.subheader('1.1 '+filtro+' Dataframe')
         st.write(df.loc[df['Country'] == filtro,['Country','Date','Confirmed','Recovered','Deaths']])
         # Graph
-        st.subheader(filtro+' Plot')
+        st.subheader('1.2 '+filtro+' Plot')
         features = {'Confirmed':'blue','Recovered':'green','Deaths':'red','All':None}
         filtro2 = st.selectbox('Select Feature',list(features.keys()))
         fig, ax = plt.subplots(figsize=(12,6))
         if filtro2 =='All':
-            ax.plot(df.loc[df['Country']==filtro,['Date']],df.loc[df['Country']==filtro,['Confirmed','Recovered','Deaths']],alpha=0.6)
+            ax.plot(data.loc[filtro,['Confirmed','Recovered','Deaths']],alpha=0.6)
             plt.legend(['Confirmed','Recovered','Deaths'])
         else:
-            ax.plot(df.loc[df['Country']==filtro,['Date']],df.loc[df['Country']==filtro,[filtro2]],label=filtro2,color=features[filtro2],alpha=0.6)
+            ax.plot(data.loc[filtro,[filtro2]],label=filtro2,color=features[filtro2],alpha=0.6)
             plt.legend()
         plt.title(filtro)
         
         if st.checkbox('Log Scale',value=False):
             ax.set_yscale('log')
+        st.pyplot()
+        st.subheader('1.3 '+filtro+': New Confirmed Cases by day')
+        ax = data.loc[filtro][['Confirmed']].diff().plot(kind='bar',figsize=(12,6),color='blue',alpha=0.6)
+        ax.set_xticklabels(data.loc[filtro].index.strftime("%d/%m"),rotation=90)
         st.pyplot()
         ####################################################################################################
         st.subheader('2. CUMULATIVE PLOT')
@@ -111,7 +118,7 @@ def load_data():
     files = []
     # Dates
     start_date =  datetime.date(2020,1,22) # First Report
-    end_date = datetime.date.today() - datetime.timedelta(days=2)# Today
+    end_date = datetime.date.today() - datetime.timedelta(days=1)# Today
     delta = end_date - start_date # Days from the first report
     # Files
     for i in range(delta.days+1):
